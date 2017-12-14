@@ -1,43 +1,48 @@
 package entities;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 
 public class Cell {
-    public Path2D membrane;
-    public double x, y;
-    private Point2D point = new Point2D.Double(20,20);
-  public double[] xPoints = {30,30,40,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-  public double[] yPoints = {30,40,30,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-    public Cell(double sx, double sy){
+
+    public double x, y, radius ,dy,dx;
+    private int r = 161, b = 255, g = 206; // Default cell color
+
+    /*
+          xPoints[i] = Math.cos(2* Math.PI/i)*2; yPoints[i] = Math.sin(i)*2;
+    */
+    public Cell(double sx, double sy, double sr){
+
+
         x = sx;
         y = sy;
-
-         membrane = new Path2D.Double();
-
-        for(int i = 0; i<20; i++){
-            xPoints[i] = Math.cos(2* Math.PI/i)*2;
-            yPoints[i] = Math.sin(i)*2;
-        }
-
-        for(int i = 0; i<5; i++){
-            if(i == 0){
-                membrane.moveTo(xPoints[i],yPoints[i]);
-            } else{
-                membrane.lineTo(xPoints[i],yPoints[i]);
-            }
-        }
-        membrane.closePath();
+        radius = sr;
 
     }
 
     public void update(){
-
+        double mv = Math.random()*1.2 - Math.random()*1.2;
+        dx = mv;
+        dy = mv;
+        move();
     }
-    public void move(){
+    public void setColor(int red,int blue,int green){
+        r = red;
+        b = blue;
+        g = green;
+    }
+    public void render(Graphics2D g2d){
+        double thick = 20;
+        g2d.setColor(new Color(r - 30,b - 30,g - 30));
+        g2d.fill(new Ellipse2D.Double(x - radius/2,y - radius/2 ,radius,radius));
+        g2d.setColor(new Color(r,b,g));
+        g2d.fill(new Ellipse2D.Double(x - radius/2 + thick/2,y - radius/2 + thick/2,radius - thick,radius - thick));
+    }
 
+    private void move(){
+        x+=dx;
+        y+=dy;
     }
 }
