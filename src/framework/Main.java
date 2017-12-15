@@ -8,7 +8,7 @@ public class Main extends JFrame {
     private Main(int x, int y){
         setSize(x,y);
         setVisible(true);
-        setTitle("Cell Simulation v1.0");
+        setTitle("Cell Simulation v1.0 alpha");
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

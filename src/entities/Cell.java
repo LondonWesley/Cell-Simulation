@@ -23,9 +23,9 @@ public class Cell {
     }
 
     public void update(){
-        double mv = Math.random()*1.2 - Math.random()*1.2;
-        dx = mv;
-        dy = mv;
+        //double mv = Math.random()*1.2 - Math.random()*1.2;
+       // dx = mv;
+        //dy = mv;
         move();
     }
     public void setColor(int red,int blue,int green){
