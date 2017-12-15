@@ -6,28 +6,35 @@ import java.awt.*;
 
 
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 import javax.swing.JPanel;
 
 
 public class Window extends JPanel {
+
     private Enum RUNNING, STOP;
 
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-    public int scrW = screenSize.width;
-    public int scrH = screenSize.height;
-    private double time = 1;
-    public double zoom = 1;
+    public static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public static int scrW = screenSize.width;
+    public static int scrH = screenSize.height;
+    public static double time = 1;
+    public static Point2D cam;
+    public static double zoom = 1;
 
     Cell cellA,cellB;
     ArrayList<Cell> Cells = new ArrayList<Cell>();
 
+
+
     public Window() {
+        cam = new Point2D.Double(0,0);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Schedule(), 1000, 10);
 
@@ -37,6 +44,7 @@ public class Window extends JPanel {
         Cells.add(cellB);
         cellB.setColor(255,119,81);
 
+
     }
     //cell spawning method for later purposes
     public void spawnCell(double x, double y, double r){
@@ -45,16 +53,16 @@ public class Window extends JPanel {
 
     public void paint(Graphics g) {
         super.paint(g);
-
-
+        //System.out.println("("+cellA.x+ ", " + cellA.y+")");
+        cam.setLocation(new Point2D.Double(ControlHandler.mouseX,ControlHandler.mouseY));
         Graphics2D g2d = (Graphics2D) g;
-        System.out.println("("+cellA.x+ ", " + cellA.y+")");
-       g2d.translate(scrW/2,scrH/2);
-       g2d.scale(zoom, zoom);
-       g2d.translate(-scrW/2,-scrH/2);
+        if(ControlHandler.startDrag !=null && ControlHandler.endDrag != null)
+            g2d.draw(new Line2D.Double(ControlHandler.startDrag.getX(), ControlHandler.startDrag.getY(), ControlHandler.endDrag.getX(), ControlHandler.endDrag.getY()));
 
-        for(int i = 1; i<360;i+=20){
-        }
+       g2d.translate(cam.getX(),cam.getY());
+       g2d.scale(zoom, zoom);
+       g2d.translate(-ControlHandler.mouseX,-ControlHandler.mouseY);
+
 
         for(int n = 0; n<Cells.size();n++){
             Cell cell = Cells.get(n);
