@@ -32,13 +32,13 @@ public class Cell {
     public  void setThickness(double thick){
         thickness = thick;
     }
+
     public void render(Graphics2D g2d){
         g2d.setColor(new Color(r - 30,b - 30,g - 30));
         g2d.fill(new Ellipse2D.Double(x - radius/2,y - radius/2 ,radius*2,radius*2));
-        /*for(int n = 0; n<Window.Cells.size();n++){
+        for(int n = 0; n<Window.Cells.size();n++){
             Cell cell = Window.Cells.get(n);
-            System.out.println(intersecting(cell));
-        }*/
+        }
         g2d.setColor(new Color(r,b,g));
         g2d.fill(new Ellipse2D.Double(x - radius/2 + thickness/2,y - radius/2 + thickness/2,radius*2 - thickness,radius*2 - thickness));
 
@@ -48,7 +48,7 @@ public class Cell {
         Point2D targetC = new Point2D.Double(cell.x,cell.y);
         double xDist = selfC.getX() - targetC.getX();
         double yDist = selfC.getY() - targetC.getY();
-        double dist =  Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+        double dist =  Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)); //TODO: figure out why selfC.distance(targetC) returns 0.0
         double r1 = this.radius;
         double r2 = cell.radius;
 

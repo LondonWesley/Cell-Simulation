@@ -61,7 +61,7 @@ public class Window extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         if(ControlHandler.startDrag !=null && ControlHandler.endDrag != null)
             g2d.draw(new Line2D.Double(ControlHandler.startDrag.getX(), ControlHandler.startDrag.getY(), ControlHandler.endDrag.getX(), ControlHandler.endDrag.getY()));
-        System.out.println(cellA.x);
+
        g2d.translate(cam.getX(),cam.getY());
        g2d.scale(zoom, zoom);
        g2d.translate(ControlHandler.mouseX,ControlHandler.mouseY);
@@ -84,6 +84,11 @@ public class Window extends JPanel {
             for(int n = 0; n<Cells.size();n++){
                 Cell cell = Cells.get(n);
                 cell.update();
+                for(int c = 0; c<Cells.size();c++) {
+                    Cell othercell = Cells.get(c);
+                    if(othercell != cell)//prevent cells from intersecting themselves
+                        System.out.println(cell.intersecting(othercell));
+                }
             }
             cellB.x = 340 + 150*Math.cos(time);
 
