@@ -29,17 +29,20 @@ public class Window extends JPanel {
     public static double zoom = 1;
 
     Cell cellA,cellB;
-    ArrayList<Cell> Cells = new ArrayList<Cell>();
+    public static ArrayList<Cell> Cells = new ArrayList<Cell>();
 
 
 
     public Window() {
+
+        setBackground(new Color(0,0,0));
+
         cam = new Point2D.Double(0,0);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Schedule(), 1000, 10);
 
         cellA = new Cell(220,220, 100);
-        cellB = new Cell(220,220, 1);
+        cellB = new Cell(330,220, 100);
         Cells.add(cellA);
         Cells.add(cellB);
         cellB.setColor(255,119,81);
@@ -53,15 +56,15 @@ public class Window extends JPanel {
 
     public void paint(Graphics g) {
         super.paint(g);
-        //System.out.println("("+cellA.x+ ", " + cellA.y+")");
+        //System.out.println("("+cellA.x+ ", " + cellB.x+")");
         cam.setLocation(new Point2D.Double(ControlHandler.mouseX,ControlHandler.mouseY));
         Graphics2D g2d = (Graphics2D) g;
         if(ControlHandler.startDrag !=null && ControlHandler.endDrag != null)
             g2d.draw(new Line2D.Double(ControlHandler.startDrag.getX(), ControlHandler.startDrag.getY(), ControlHandler.endDrag.getX(), ControlHandler.endDrag.getY()));
-
+        System.out.println(cellA.x);
        g2d.translate(cam.getX(),cam.getY());
        g2d.scale(zoom, zoom);
-       g2d.translate(-ControlHandler.mouseX,-ControlHandler.mouseY);
+       g2d.translate(ControlHandler.mouseX,ControlHandler.mouseY);
 
 
         for(int n = 0; n<Cells.size();n++){
@@ -77,11 +80,12 @@ public class Window extends JPanel {
 
     class Schedule extends TimerTask {
         public void run(){
-
+            time+= 0.01;
             for(int n = 0; n<Cells.size();n++){
                 Cell cell = Cells.get(n);
                 cell.update();
             }
+            cellB.x = 340 + 150*Math.cos(time);
 
             repaint();
         }
