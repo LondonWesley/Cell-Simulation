@@ -13,6 +13,9 @@ public class ControlHandler {
     public static double mouseX = 0;
     public static double mouseY = 0;
 
+    public static double camX = 0;
+    public static double camY = 0;
+
     public static double ShiftX = 0;
     public static double ShiftY = 0;
 
@@ -45,20 +48,22 @@ public class ControlHandler {
         @Override
         public void mouseMoved(MouseEvent e){
             super.mouseMoved(e);
+            mouseX = e.getX();
+            mouseY = e.getY();
 
         }
         @Override
         public void mouseDragged(MouseEvent e) {
             super.mouseDragged(e);
             endDrag = e.getPoint();
-            mouseX = (-endDrag.getX() + startDrag.getX())/(-Window.zoom*2) + ShiftX;
-            mouseY = (-endDrag.getY() + startDrag.getY())/(-Window.zoom*2) + ShiftY;
+            camX = (-endDrag.getX() + startDrag.getX())/(-Window.zoom*2) + ShiftX;
+            camY = (-endDrag.getY() + startDrag.getY())/(-Window.zoom*2) + ShiftY;
         }
         @Override
        public void mouseReleased(MouseEvent e){
             super.mouseReleased(e);
-            ShiftX = mouseX;
-            ShiftY = mouseY;
+            ShiftX = camX;
+            ShiftY = camY;
             endDrag = null;
         }
     };
