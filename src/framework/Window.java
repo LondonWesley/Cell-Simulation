@@ -32,7 +32,6 @@ public class Window extends JPanel {
     public static ArrayList<Cell> Cells = new ArrayList<Cell>();
 
 
-
     public Window() {
 
         setBackground(new Color(0,0,0));
@@ -41,17 +40,17 @@ public class Window extends JPanel {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Schedule(), 1000, 10);
 
-        cellA = new Cell(420,420, 200);
-        cellB = new Cell(420,420, 100);
+        cellA = new Cell(420,420, 300, "CellA");
+        cellB = new Cell(420,420, 200, "CellB");
         Cells.add(cellA);
         Cells.add(cellB);
-        cellB.setColor(255,119,81);
+        cellB.setColor(255,119,101);
 
 
     }
     //cell spawning method for later purposes
-    public void spawnCell(double x, double y, double r){
-        Cells.add(new Cell( x, y, r));
+    public void spawnCell(double x, double y, double r,String n){
+        Cells.add(new Cell( x, y, r,n));
     }
 
     public void paint(Graphics g) {
@@ -74,29 +73,6 @@ public class Window extends JPanel {
             g2d.fill(new Ellipse2D.Double(cell.x -5,cell.y - 5, 10, 10));
         }
 
-        for(int n = 0; n<Cells.size();n++){
-            Cell cell = Cells.get(n);
-            cell.update();
-
-            for(int c = 0; c<Cells.size();c++) {
-                Cell othercell = Cells.get(c);
-                if(othercell != cell)
-                    if(cell.intersecting(othercell)) {
-
-                        ArrayList<Point2D> intersects = cell.getPointsOfIntersection(othercell);
-                        for (int t = 0; t < intersects.size(); t++) {
-                            Point2D pnt = intersects.get(t);
-                            g2d.setColor(Color.blue);
-                            g2d.drawString(pnt.getX()+"",20,20);
-                            g2d.fill(new Ellipse2D.Double(pnt.getX() - 10,pnt.getY() - 10,20,20));
-
-                        }
-                    }
-            }
-
-
-
-        }
 
         g2d.dispose();
 
@@ -105,9 +81,11 @@ public class Window extends JPanel {
     class Schedule extends TimerTask {
         public void run(){
             time+= 0.001;
-
-            cellB.x = ControlHandler.mouseX;
-            cellB.y = ControlHandler.mouseY;
+            for(Cell cell : Cells) {
+                cell.update();
+            }
+            cellA.x = ControlHandler.mouseX;
+            cellA.y = ControlHandler.mouseY;
            // cellB.y = 420 + 150*Math.sin(time);
 
             repaint();
