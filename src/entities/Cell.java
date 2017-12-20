@@ -1,5 +1,7 @@
 package entities;
 import framework.Window;
+import utility.Clip;
+
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
@@ -8,108 +10,132 @@ import java.util.ArrayList;
 public class Cell {
 
     private ArrayList<Cell> Cells = Window.Cells;
-    public double x, y, radius ,dy,dx;
+    private ArrayList<Clip> Clips = new ArrayList<Clip>();
+    public double x, y, radius, dy, dx;
     private double thickness;
     private int r = 161, b = 255, g = 206; // Default cell color
     public String name = "";
 
-    public Cell(double sx, double sy, double sr,String nickname){
+    public Cell(double sx, double sy, double sr, String nickname) {
         x = sx;
         y = sy;
         radius = sr;
-        thickness = sr/5;
+        thickness = 15;
         name = nickname;
 
     }
 
-    public void update(){
+    public void update() {
         move();
 
     }
-    public void setColor(int red,int blue,int green){
+
+    public void setColor(int red, int blue, int green) {
         r = red;
         b = blue;
         g = green;
     }
-    public  void setThickness(double thick){
+
+    public void setThickness(double thick) {
         thickness = thick;
     }
 
-    public void render(Graphics2D g2d){
+    public void render(Graphics2D g2d) {
 
-        //Outer membrane of cell
+        //clips off area and then draws the rest of the cell
         clipIntersections(g2d);
-        g2d.setColor(new Color(r - 30,b - 30,g - 30));
-        g2d.draw(new Ellipse2D.Double(x - radius,y - radius, radius *2,radius*2));
-        for(int n = 0; n<Window.Cells.size();n++){
-            Cell cell = Window.Cells.get(n);
-        }
-        g2d.setColor(new Color(r,b,g));
-        g2d.draw(new Ellipse2D.Double(x - (radius - thickness), y - (radius - thickness),(radius - thickness)*2,(radius - thickness)*2));
-
+        drawcell(g2d);
+        closeCellClips(g2d);
+        g2d.setClip(null);
+        Clips.clear();
     }
-    public boolean intersecting(Cell cell){
-        Point2D selfC = new Point2D.Double(x,y);
-        Point2D targetC = new Point2D.Double(cell.x,cell.y);
+
+    public boolean intersecting(Cell cell) {
+        Point2D selfC = new Point2D.Double(x, y);
+        Point2D targetC = new Point2D.Double(cell.x, cell.y);
         double xDist = selfC.getX() - targetC.getX();
         double yDist = selfC.getY() - targetC.getY();
-        double dist =  Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)); //TODO: figure out why selfC.distance(targetC) returns 0.0
+        double dist = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)); //TODO: figure out why selfC.distance(targetC) returns 0.0
         double r1 = this.radius;
         double r2 = cell.radius;
 
-        if(dist>r1+r2) {
-           //System.out.println("Final Distance" + dist);
+        if (dist > r1 + r2) {
+            //System.out.println("Final Distance" + dist);
             return false;
-        }
-        else{
+        } else {
             //System.out.println("Current Distance" + dist);
             return true;
         }
     }
 
-    private void clipIntersections(Graphics2D g2d){
-
-            for(Cell othercell: Cells) {
-                System.out.println(this.name+ " USED COLLISION CHECK ON "+othercell.name);
-                if(othercell == this) {
-                    System.out.println(this.name+ " TRIED TO TOUCH ITSELF");
-                }else
-                    if(this.intersecting(othercell)) {
-                        System.out.println(this.name+ " SUCCESSFULLY TOUCHED "+ othercell.name);
-                        //find points of intersections between cells
-                        ArrayList<Point2D> intersects = this.getPointsOfIntersection(othercell);
-                        System.out.println(this.name+ " HAS ACCESSED P.O.I. FROM "+ othercell.name);
-                        for (Point2D pnt : intersects) {
-                            System.out.println(this.name+ " HAS MARKED A POINT");
-                            g2d.setColor(Color.blue);
-                            g2d.drawString(pnt.getX()+"",20,20);
-                            g2d.draw(new Ellipse2D.Double(pnt.getX() - 10,pnt.getY() - 10,20,20));
-                        }
-                        AffineTransform old = g2d.getTransform();
-                        //Makes sure there's atleast 2 points
-                        if(intersects.size()>0) {
-                            System.out.println(this.name+ " HAS DRAWN ITS BOX");
-                            Point2D pn1 = intersects.get(0),
-                                    pn2 = intersects.get(1),
-                                    midPoint;
-                            double mx = (pn1.getX() + pn2.getX())/2;
-                            double my = (pn1.getY() + pn2.getY())/2;
-                            midPoint = new Point2D.Double(mx,my);
-                            //double distance = new Point2D.Double(x,y).distance(midPoint);
-                            double slopeX = (midPoint.getY() - this.y);
-                            double slopeY = (midPoint.getX() - this.x);
-                            double ang = -Math.atan2(slopeY, slopeX) + Math.PI;
-                                g2d.translate(midPoint.getX(),midPoint.getY());
-                                g2d.rotate(ang);
-                                g2d.draw(new Rectangle2D.Double(-radius, 0,radius*2,radius*2));
-
-                            g2d.setTransform(old);
-                        }
+    private void clipIntersections(Graphics2D g2d) {
+        if (Cells.size() > 1) {
+            for (Cell othercell : Cells) {
+                System.out.println(this.name + " USED COLLISION CHECK ON " + othercell.name);
+                if (othercell == this) {
+                    System.out.println(this.name + " TRIED TO TOUCH ITSELF");
+                } else if (this.intersecting(othercell)) {
+                    System.out.println(this.name + " SUCCESSFULLY TOUCHED " + othercell.name);
+                    //find points of intersections between cells
+                    ArrayList<Point2D> intersects = this.getPointsOfIntersection(othercell);
+                    System.out.println(this.name + " HAS ACCESSED P.O.I. FROM " + othercell.name);
+                    for (Point2D pnt : intersects) {
+                        System.out.println(this.name + " HAS MARKED A POINT");
+                        //g2d.setColor(Color.blue);
+                        //g2d.drawString(pnt.getX()+"",20,20);
+                        // g2d.draw(new Ellipse2D.Double(pnt.getX() - 10,pnt.getY() - 10,20,20));
                     }
+                    AffineTransform old = g2d.getTransform();
+                    //Makes sure there's atleast 2 points
+                    if (intersects.size() > 0) {
+                        System.out.println(this.name + " HAS DRAWN ITS BOX");
+                        Point2D pn1 = intersects.get(0),
+                                pn2 = intersects.get(1),
+                                midPoint;
+                        double mx = (pn1.getX() + pn2.getX()) / 2;
+                        double my = (pn1.getY() + pn2.getY()) / 2;
+                        midPoint = new Point2D.Double(mx, my);
+                        double distance = pn1.distance(pn2);
+                        double slopeX = (midPoint.getY() - this.y);
+                        double slopeY = (midPoint.getX() - this.x);
+                        double ang = -Math.atan2(slopeY, slopeX) + Math.PI;
+
+                        g2d.translate(midPoint.getX(), midPoint.getY());
+                        g2d.rotate(ang);
+                        g2d.draw(new Rectangle2D.Double(-radius, 0, radius * 2, radius * 2));
+                        g2d.clip(new Rectangle2D.Double(-radius, 0, radius * 2, radius * 2));
+                        Clips.add(new Clip(ang, midPoint.getX(), midPoint.getY(), distance));
+
+                        g2d.setTransform(old);
+
+                    }
+                }
             }
             System.out.println(this.name + " ENDED TASK");
+        }
     }
-
+    public void closeCellClips(Graphics2D g2d){
+        AffineTransform original = g2d.getTransform();
+        g2d.setColor(new Color(r - 30, b - 30, g - 30));
+        for(Clip clip : Clips){
+            g2d.translate(clip.x, clip.y);
+            g2d.rotate(clip.ang);
+            Path2D visclip = new Path2D.Double();
+            visclip.moveTo(clip.size / 2, 0);
+            visclip.lineTo(-clip.size / 2, 0);
+            visclip.lineTo(-clip.size / 2, thickness);
+            visclip.lineTo(clip.size / 2, thickness);
+            visclip.closePath();
+            g2d.fill(visclip);
+            g2d.setTransform(original);
+        }
+    }
+    public void drawcell(Graphics2D g2d){
+        g2d.setColor(new Color(r - 30,b - 30,g - 30));
+        g2d.fill(new Ellipse2D.Double(x - radius,y - radius, radius *2,radius*2));
+        g2d.setColor(new Color(r,b,g));
+        g2d.fill(new Ellipse2D.Double(x - (radius - thickness), y - (radius - thickness),(radius - thickness)*2,(radius - thickness)*2));
+    }
     public double acossafe(double x) {
         if (x >= +1.0) return 0;
         if (x <= -1.0) return Math.PI;

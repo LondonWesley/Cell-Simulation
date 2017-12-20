@@ -40,11 +40,14 @@ public class Window extends JPanel {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Schedule(), 1000, 10);
 
-        cellA = new Cell(420,420, 300, "CellA");
+        cellA = new Cell(420,420, 200, "CellA");
         cellB = new Cell(420,420, 200, "CellB");
         Cells.add(cellA);
         Cells.add(cellB);
         cellB.setColor(255,119,101);
+        cellA.setColor(255,236,35);
+
+        spawnCell(700,500,200,"Celly");
 
 
     }
@@ -64,7 +67,6 @@ public class Window extends JPanel {
        g2d.translate(cam.getX(),cam.getY());
        g2d.scale(zoom, zoom);
        g2d.translate(ControlHandler.camX,ControlHandler.camY);
-
 
         for(int n = 0; n<Cells.size();n++){
             Cell cell = Cells.get(n);
