@@ -1,4 +1,6 @@
 package entities;
+import framework.ControlHandler;
+import framework.Main;
 import framework.Window;
 import utility.Clip;
 
@@ -22,12 +24,10 @@ public class Cell {
         radius = sr;
         thickness = 15;
         name = nickname;
-
     }
 
     public void update() {
         move();
-
     }
 
     public void setColor(int red, int blue, int green) {
@@ -40,14 +40,34 @@ public class Cell {
         thickness = thick;
     }
 
+    public boolean isInView(){
+        Point2D worldpos = new Point2D.Double((ControlHandler.camX/Window.zoom + x),ControlHandler.camY/Window.zoom + y);
+
+        double scrW,scrH;
+            scrW = Window.scrW;
+            scrH = Window.scrH;
+
+
+
+
+
+        if(worldpos.getX() + radius>20&&worldpos.getX() - radius<scrW / Window.zoom - 100){
+            if(worldpos.getY() + radius>20&&worldpos.getY() - radius<scrH / Window.zoom - 100) {
+                return true;
+            } else return false;
+        } else
+            return false;
+    }
+
     public void render(Graphics2D g2d) {
 
-        //clips off area and then draws the rest of the cell
-        clipIntersections(g2d);
-        drawcell(g2d);
-        closeCellClips(g2d);
-        g2d.setClip(null);
-        Clips.clear();
+        if(isInView()) {
+            clipIntersections(g2d);
+            drawcell(g2d);
+            closeCellClips(g2d);
+            g2d.setClip(null);
+            Clips.clear();
+        }
     }
 
     public boolean intersecting(Cell cell) {
@@ -71,16 +91,16 @@ public class Cell {
     private void clipIntersections(Graphics2D g2d) {
         if (Cells.size() > 1) {
             for (Cell othercell : Cells) {
-                System.out.println(this.name + " USED COLLISION CHECK ON " + othercell.name);
+                //System.out.println(this.name + " USED COLLISION CHECK ON " + othercell.name);
                 if (othercell == this) {
-                    System.out.println(this.name + " TRIED TO TOUCH ITSELF");
+                    //System.out.println(this.name + " TRIED TO TOUCH ITSELF");
                 } else if (this.intersecting(othercell)) {
-                    System.out.println(this.name + " SUCCESSFULLY TOUCHED " + othercell.name);
+                    //System.out.println(this.name + " SUCCESSFULLY TOUCHED " + othercell.name);
                     //find points of intersections between cells
                     ArrayList<Point2D> intersects = this.getPointsOfIntersection(othercell);
-                    System.out.println(this.name + " HAS ACCESSED P.O.I. FROM " + othercell.name);
+                    //System.out.println(this.name + " HAS ACCESSED P.O.I. FROM " + othercell.name);
                     for (Point2D pnt : intersects) {
-                        System.out.println(this.name + " HAS MARKED A POINT");
+                        //System.out.println(this.name + " HAS MARKED A POINT");
                         //g2d.setColor(Color.blue);
                         //g2d.drawString(pnt.getX()+"",20,20);
                         // g2d.draw(new Ellipse2D.Double(pnt.getX() - 10,pnt.getY() - 10,20,20));
@@ -88,7 +108,7 @@ public class Cell {
                     AffineTransform old = g2d.getTransform();
                     //Makes sure there's atleast 2 points
                     if (intersects.size() > 0) {
-                        System.out.println(this.name + " HAS DRAWN ITS BOX");
+                        //System.out.println(this.name + " HAS DRAWN ITS BOX");
                         Point2D pn1 = intersects.get(0),
                                 pn2 = intersects.get(1),
                                 midPoint;
@@ -102,7 +122,7 @@ public class Cell {
 
                         g2d.translate(midPoint.getX(), midPoint.getY());
                         g2d.rotate(ang);
-                        g2d.draw(new Rectangle2D.Double(-radius, 0, radius * 2, radius * 2));
+                        //g2d.draw(new Rectangle2D.Double(-radius, 0, radius * 2, radius * 2));
                         g2d.clip(new Rectangle2D.Double(-radius, 0, radius * 2, radius * 2));
                         Clips.add(new Clip(ang, midPoint.getX(), midPoint.getY(), distance));
 
@@ -111,7 +131,7 @@ public class Cell {
                     }
                 }
             }
-            System.out.println(this.name + " ENDED TASK");
+           // System.out.println(this.name + " ENDED TASK");
         }
     }
     public void closeCellClips(Graphics2D g2d){

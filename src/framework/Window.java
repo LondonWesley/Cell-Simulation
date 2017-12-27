@@ -8,8 +8,8 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,7 +40,7 @@ public class Window extends JPanel {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new Schedule(), 1000, 10);
 
-        cellA = new Cell(420,420, 200, "CellA");
+        cellA = new Cell(520,420, 200, "CellA");
         cellB = new Cell(420,420, 200, "CellB");
         Cells.add(cellA);
         Cells.add(cellB);
@@ -58,15 +58,28 @@ public class Window extends JPanel {
 
     public void paint(Graphics g) {
         super.paint(g);
-        //System.out.println("("+cellA.x+ ", " + cellB.x+")");
+
         cam.setLocation(new Point2D.Double(ControlHandler.camX,ControlHandler.camY));
         Graphics2D g2d = (Graphics2D) g;
+
+        g2d.setColor(new Color(233, 101, 0));
+        g2d.drawString("CellA pos("+cellA.x+", "+cellA.y+")", 20,20);
+        g2d.drawString("CellA WORLD pos("+(cellA.x + cam.getX()/zoom)+", "+(cellA.y + cam.getY()/zoom)+")", 20,40);
+        g2d.drawString("MousePos("+ControlHandler.mouseX+", "+ControlHandler.mouseY+")", 20,60);
+        g2d.drawString("Zoom: "+zoom, 20,80);
+        g2d.drawString("CameraPos: ("+(-cam.getX()/zoom )+","+(-cam.getY()/zoom)+")", 20,100);
+
+
+
         if(ControlHandler.startDrag !=null && ControlHandler.endDrag != null)
             g2d.draw(new Line2D.Double(ControlHandler.startDrag.getX(), ControlHandler.startDrag.getY(), ControlHandler.endDrag.getX(), ControlHandler.endDrag.getY()));
 
        g2d.translate(cam.getX(),cam.getY());
        g2d.scale(zoom, zoom);
-       g2d.translate(ControlHandler.camX,ControlHandler.camY);
+            /*transformation stabilization
+                g2d.draw(new Ellipse2D.Double(-cam.getX()/zoom + cellA.x,-cam.getY()/zoom + cellA.y,20,20));
+            */
+
 
         for(int n = 0; n<Cells.size();n++){
             Cell cell = Cells.get(n);
@@ -74,10 +87,8 @@ public class Window extends JPanel {
             g2d.setColor(Color.RED);
             g2d.fill(new Ellipse2D.Double(cell.x -5,cell.y - 5, 10, 10));
         }
-
-
+        g2d.translate(-cam.getX()/zoom,-cam.getY()/zoom);
         g2d.dispose();
-
     }
 
     class Schedule extends TimerTask {
@@ -86,8 +97,9 @@ public class Window extends JPanel {
             for(Cell cell : Cells) {
                 cell.update();
             }
-            cellA.x = ControlHandler.mouseX;
-            cellA.y = ControlHandler.mouseY;
+
+            //cellA.x = ControlHandler.mouseX;
+            //cellA.y = ControlHandler.mouseY;
            // cellB.y = 420 + 150*Math.sin(time);
 
             repaint();

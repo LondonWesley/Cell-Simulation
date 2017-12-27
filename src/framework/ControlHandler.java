@@ -36,13 +36,17 @@ public class ControlHandler {
             startDrag = e.getPoint();
             endDrag = null;
             System.out.println("START("+e.getPoint().getX()+", "+e.getPoint().getY()+")");
+            mouseX = e.getX();
+            mouseY = e.getY();
         }
 
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             super.mouseWheelMoved(e);
-                Window.zoom += e.getPreciseWheelRotation() / 20;
-                System.out.println(e.getPreciseWheelRotation());
+            if(e.getPreciseWheelRotation()>0)
+                Window.zoom -=0.1;
+            else
+                Window.zoom+=0.1;
 
         }
         @Override
@@ -56,8 +60,11 @@ public class ControlHandler {
         public void mouseDragged(MouseEvent e) {
             super.mouseDragged(e);
             endDrag = e.getPoint();
-            camX = (-endDrag.getX() + startDrag.getX())/(-Window.zoom*2) + ShiftX;
-            camY = (-endDrag.getY() + startDrag.getY())/(-Window.zoom*2) + ShiftY;
+            double c = Window.zoom + 1;
+            camX = (endDrag.getX() - startDrag.getX())/c + ShiftX;
+            camY = (endDrag.getY() - startDrag.getY())/c + ShiftY;
+            mouseX = e.getX();
+            mouseY = e.getY();
         }
         @Override
        public void mouseReleased(MouseEvent e){
@@ -65,6 +72,8 @@ public class ControlHandler {
             ShiftX = camX;
             ShiftY = camY;
             endDrag = null;
+            mouseX = e.getX();
+            mouseY = e.getY();
         }
     };
 
